@@ -30,3 +30,21 @@ Code in: `shared/components/app/`, `shared/states/`
   - [x] Translations, boundary, docs
 3. [ ] Verify it: /check verify ui foundation
 4. [ ] Test it: /test ui foundation
+
+## Design configuration (in-progress)
+
+Intent: one typed theme plus locale module with semantic variables, live switching, a local asset pipeline, and prefixed routing with generated messages.
+
+Done when: setup stamps the module, theme switches live with persistence, assets generate locally, and scans find no raw literals or hardcoded copy.
+
+Spec: [0003](../specs/0003-design-configuration/index.md)
+
+Code in: `shared/themes/`, `scripts/generate-assets.ts`
+
+1. [x] Design it (spec)
+2. [x] Build it: /develop design configuration
+  - [x] Typed module plus provider plus density plus primary
+  - [x] Pipeline plus logo plus routing plus messages default
+  - [x] Scans plus settings API plus docs
+3. [ ] Verify it: /check verify design configuration
+4. [ ] Test it: /test design configuration
