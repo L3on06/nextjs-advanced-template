@@ -1,0 +1,68 @@
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->
+
+# i18n rules (i18next, English + Albanian)
+
+Follow these rules on every change that touches user facing text.
+
+## Translation files
+
+- Live in `shared/translations/`, one flat JSON per locale (`en.json`, `al.json`).
+- Flat string keys only, never nested objects. Keys stay identical across all
+  files, only values are translated. `shared/translations/index.ts` enforces
+  this at build time, so a missing key, an extra key, or a nested value fails
+  `tsc` instead of shipping.
+- Interpolation uses `{{name}}` placeholders. Never concatenate translated
+  fragments in code.
+
+## The one integration point
+
+- `shared/components/i18n/i18n-provider.tsx` owns all locale logic (cookie
+  `NEXT_LOCALE`, localStorage, prefix navigation). Import UI pieces only from
+  `@/components/i18n` (`I18nProvider`, `T`, `useT`, `useLocale`,
+  `useChangeLocale`, `LanguageSwitcher`, `LocaleFlag`). Never import
+  `react-i18next` or `i18next` directly in pages or features.
+- Config lives in `shared/i18n/settings.ts` (`LOCALES`, `DEFAULT_LOCALE`,
+  `LOCALE_META` with flag-icons codes). `proxy.ts` duplicates these constants
+  on purpose because edge code must not import shared app modules. Change both
+  together when adding a locale.
+
+## Client vs server
+
+- Server components: `const { t } = await getT(locale)` from
+  `@/shared/i18n/server` (`server-only` guarded). Cookie mode pages resolve
+  the locale with `getServerLocale()`; `app/[locale]/` pages use the URL param
+  after an `isLocale()` + `notFound()` check.
+- Client components: `<T k="welcome" />` or `const { t } = useT()`. Keys are
+  typed as `TranslationKey`, so unknown keys fail `tsc`.
+- New user facing string: add the key to `en.json` first, then the same key to
+  every other locale file. Never hardcode display text in JSX.
+
+## Routing toggle (.env)
+
+- `NEXT_PUBLIC_I18N_PREFIX_LOCALE=true` serves `/en` and `/al` URLs. `proxy.ts`
+  redirects prefixless visits (cookie, then Accept-Language with `sq` mapping
+  to `al`, then default) and the switcher pushes prefixed URLs.
+- `false` (default) keeps URLs clean. The locale persists in the cookie and
+  the switcher swaps language in place plus `router.refresh()`.
+- `NEXT_PUBLIC_I18N_DEFAULT_LOCALE` sets the fallback locale.
+- `app/[locale]/layout.tsx` validates the param and nests an `I18nProvider`
+  inside the root one. Keep both providers wired in any layout refactor.
+- Never use `middleware.ts`. Next 16 renamed it to `proxy.ts` and the old
+  convention is deprecated.
+
+## Flags
+
+- `LocaleFlag` renders `flag-icons` classes from `LOCALE_META`. The CSS bundle
+  import (`flag-icons/css/flag-icons.min.css`) stays in `app/layout.tsx`
+  because global CSS may only be imported from a layout. To support a locale,
+  extend `LOCALE_META`, no component changes needed.
+- The switcher labels each language in its own language (`English`, `Shqip`).
+  Never run those labels through `t()`.

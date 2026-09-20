@@ -1,0 +1,11 @@
+{
+  "app_title": "Leon Shabani",
+  "app_tagline": "Shablloni standard i Next.js",
+  "welcome": "Mirë se vini",
+  "hello_user": "Përshëndetje, {{name}}!",
+  "language": "Gjuha",
+  "current_language": "Gjuha aktuale: {{language}}",
+  "language_changed": "Gjuha u ndryshua në {{language}}",
+  "toggle_theme": "Ndrysho temën",
+  "home_hint": "Ndryshoni app/page.tsx dhe ndërfaqja përditësohet automatikisht."
+}

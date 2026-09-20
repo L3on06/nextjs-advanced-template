@@ -1,0 +1,11 @@
+{
+  "app_title": "Leon Shabani",
+  "app_tagline": "Next.js standard template",
+  "welcome": "Welcome",
+  "hello_user": "Hello, {{name}}!",
+  "language": "Language",
+  "current_language": "Current language: {{language}}",
+  "language_changed": "Language switched to {{language}}",
+  "toggle_theme": "Toggle theme",
+  "home_hint": "Edit app/page.tsx and your UI updates live."
+}
