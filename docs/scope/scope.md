@@ -48,3 +48,21 @@ Code in: `shared/themes/`, `scripts/generate-assets.ts`
   - [x] Scans plus settings API plus docs
 3. [ ] Verify it: /check verify design configuration
 4. [ ] Test it: /test design configuration
+
+## Starter update (in-progress)
+
+Intent: versioned kit updates with preview, per conflict picks, backup plus rollback, ordered migrations, and full gate validation, never touching Application files or secrets.
+
+Done when: check previews without writing, updates apply with backup and green gates, conflicts ask per file, failures restore byte identical trees, and the matrix passes.
+
+Spec: [0004](../specs/0004-starter-update/index.md)
+
+Code in: `scripts/starter/`, `scripts/starter-check.ts`, `scripts/starter-update.ts`, `migrations/`
+
+1. [x] Design it (spec)
+2. [x] Build it: /develop starter update
+  - [x] Manifest plus check plus classification
+  - [x] Preview plus backup plus apply plus conflicts
+  - [x] Migrations plus rollback plus gates plus docs
+3. [ ] Verify it: /check verify starter update
+4. [ ] Test it: /test starter update
