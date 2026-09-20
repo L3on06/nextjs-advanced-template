@@ -17,9 +17,11 @@ function flag(name: string): string | undefined {
 }
 
 const targetDir = resolve(flag("--target") ?? process.cwd());
+const allowDir = flag("--allow");
 const inputs = flag("--input") ? (JSON.parse(flag("--input") as string) as Record<string, Record<string, unknown>>) : {};
 const wizard = new Wizard(ALL_STEPS, {
   targetDir,
+  allowlist: allowDir ? [allowDir] : undefined,
   force: process.argv.includes("--force"),
   inputs,
 });

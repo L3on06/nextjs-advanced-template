@@ -1,0 +1,7 @@
+{
+  "$comment": "Starter set allowlist for the golden content audit. Anything outside this list fails the run.",
+  "collections": ["users", "invites"],
+  "routes": ["home", "signIn", "dashboard", "profile", "settings", "admin", "golden-sign-in", "golden-theme", "golden-statuses"],
+  "messageGroups": ["app.", "nav.", "auth.", "common.", "status.", "action.", "theme.", "sign_in."],
+  "assets": ["logo.svg", "og.svg", "icon-180.png", "icon-192.png", "icon-512.png", "favicon-32.png", "favicon-16.png", "og-light.png", "og-dark.png"]
+}

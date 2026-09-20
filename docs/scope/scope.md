@@ -66,3 +66,21 @@ Code in: `scripts/starter/`, `scripts/starter-check.ts`, `scripts/starter-update
   - [x] Migrations plus rollback plus gates plus docs
 3. [ ] Verify it: /check verify starter update
 4. [ ] Test it: /test starter update
+
+## Golden project (in-progress)
+
+Intent: a temp stamped reference app with auth plus theme plus status wall and no business features, plus one ordered gate command proving every Core release with blocking failures and a JSON report.
+
+Done when: the wizard stamps the golden inputs clean, all demo surfaces serve, the full gate passes including cross release update, and the content audit holds.
+
+Spec: [0005](../specs/0005-golden-project/index.md)
+
+Code in: `golden/`, `scripts/golden/`, `scripts/run-golden.ts`
+
+1. [x] Design it (spec)
+2. [x] Build it: /develop golden project
+  - [x] Golden inputs plus temp stamp proof
+  - [x] Demo surfaces plus content audit
+  - [x] Gate runner plus report plus tests
+3. [ ] Verify it: /check verify golden project
+4. [ ] Test it: /test golden project

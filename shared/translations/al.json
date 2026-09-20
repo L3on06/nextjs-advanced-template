@@ -27,5 +27,15 @@
   "status_feature_disabled_title": "Funksioni i padisponueshëm",
   "status_feature_disabled_message": "Ky funksion është i fikur për momentin.",
   "action_retry": "Provo përsëri",
-  "action_sign_in": "Hyr"
+  "action_sign_in": "Hyr",
+  "auth_email": "Email",
+  "auth_password": "Fjalëkalimi",
+  "auth_continue_google": "Vazhdo me Google",
+  "auth_signed_in_as": "I kyçur",
+  "theme_title": "Tema",
+  "theme_mode": "Mënyra",
+  "theme_density": "Dendësia",
+  "theme_primary": "Ngjyra kryesore",
+  "status_wall_title": "Muri i statuseve",
+  "sign_in_title": "Hyr"
 }
