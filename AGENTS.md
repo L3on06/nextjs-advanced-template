@@ -96,6 +96,16 @@ This is the entry point. Follow it on every task before editing.
 - No secrets in the repo. Env is validated with fail fast at boot.
 - No business logic in `CORE`. No hardcoded user facing copy, routes, or role
   strings outside their owning modules.
+- Never hand edit `node_modules/` or `package-lock.json`. Both are generated
+  output, not source. If an install looks broken, remove them and reinstall
+  clean instead of patching files inside:
+  `rm -rf node_modules package-lock.json && npm install`
+  (a clean reinstall is cheaper than debugging dependency drift file by file,
+  and it keeps AI token spend low).
+- Installing, removing, updating, or otherwise editing a package is a decision,
+  not a side effect. Ask first and show why: what breaks or improves, which
+  version and why that version, and what else it pulls in. Only run the change
+  after confirmation.
 
 ## 3. Responsibility split
 
