@@ -1,11 +1,58 @@
-import { writeFileSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import {
   AUTHZ_CONFIG,
+  type AuthzConfig,
   type FirestoreResource,
+  type Permission,
   type Policy,
+  type Role,
   type StorageResource,
 } from "./config";
+
+export interface StatusSet {
+  name: string;
+  values: string[];
+}
+
+export interface ResolvedConfig extends AuthzConfig {
+  statuses: StatusSet[];
+}
+
+interface OverridesFile {
+  roles?: Role[];
+  grants?: Partial<Record<Permission, Role[]>>;
+  routes?: ResolvedConfig["routes"];
+  navigation?: ResolvedConfig["navigation"];
+  features?: ResolvedConfig["features"];
+  firestore?: FirestoreResource[];
+  storage?: StorageResource[];
+  statuses?: StatusSet[];
+}
+
+/** Layer wizard overrides (shared/permissions/overrides.json) over the base config. */
+export function resolveConfig(root: string = process.cwd()): ResolvedConfig {
+  const path = join(root, "shared", "permissions", "overrides.json");
+  let overrides: OverridesFile = {};
+  if (existsSync(path)) {
+    try {
+      overrides = JSON.parse(readFileSync(path, "utf8")) as OverridesFile;
+    } catch {
+      overrides = {};
+    }
+  }
+  return {
+    roles: overrides.roles ?? AUTHZ_CONFIG.roles,
+    permissions: AUTHZ_CONFIG.permissions,
+    grants: { ...AUTHZ_CONFIG.grants, ...(overrides.grants ?? {}) },
+    routes: [...AUTHZ_CONFIG.routes, ...(overrides.routes ?? [])],
+    navigation: [...AUTHZ_CONFIG.navigation, ...(overrides.navigation ?? [])],
+    features: [...AUTHZ_CONFIG.features, ...(overrides.features ?? [])],
+    firestore: [...AUTHZ_CONFIG.firestore, ...(overrides.firestore ?? [])],
+    storage: [...AUTHZ_CONFIG.storage, ...(overrides.storage ?? [])],
+    statuses: overrides.statuses ?? [],
+  };
+}
 
 /**
  * Deterministic compilers: config in, rules text out. No timestamps, no
@@ -25,7 +72,11 @@ function paramRef(value: string | readonly string[]): string {
 }
 
 /** Compile a policy to a Firestore CEL expression. */
-export function compileFirestorePolicy(policy: Policy, database = "$(database)"): string {
+export function compileFirestorePolicy(
+  policy: Policy,
+  config: ResolvedConfig = resolveConfig(),
+  database = "$(database)",
+): string {
   switch (policy.kind) {
     case "public":
       return "true";
@@ -38,7 +89,7 @@ export function compileFirestorePolicy(policy: Policy, database = "$(database)")
     case "roles":
       return `request.auth != null && (${policy.roles.map((role) => `hasRole('${role}')`).join(" || ")})`;
     case "permission": {
-      const granted = AUTHZ_CONFIG.grants[policy.permission] ?? [];
+      const granted = config.grants[policy.permission] ?? [];
       return `request.auth != null && (${granted.map((role) => `hasRole('${role}')`).join(" || ")})`;
     }
     case "emailMatch":
@@ -62,9 +113,9 @@ export function compileFirestorePolicy(policy: Policy, database = "$(database)")
       ].join(" && ");
     }
     case "all":
-      return policy.policies.map((child) => `(${compileFirestorePolicy(child, database)})`).join(" && ");
+      return policy.policies.map((child) => `(${compileFirestorePolicy(child, config, database)})`).join(" && ");
     case "any":
-      return policy.policies.map((child) => `(${compileFirestorePolicy(child, database)})`).join(" || ");
+      return policy.policies.map((child) => `(${compileFirestorePolicy(child, config, database)})`).join(" || ");
   }
 }
 
@@ -93,18 +144,18 @@ const FIRESTORE_HELPERS = `    function isSignedIn() {
     }
 `;
 
-function compileFirestoreResource(resource: FirestoreResource): string {
+function compileFirestoreResource(resource: FirestoreResource, config: ResolvedConfig): string {
   const ops = (["get", "list", "create", "update", "delete"] as const)
-    .map((op) => `      allow ${op}: if ${compileFirestorePolicy(resource.policies[op])};`)
+    .map((op) => `      allow ${op}: if ${compileFirestorePolicy(resource.policies[op], config)};`)
     .join("\n");
   return `    match /${resource.path} {
 ${ops}
     }`;
 }
 
-export function buildFirestoreRules(): string {
-  const helpers = FIRESTORE_RESOURCES_USE_LOOKUP ? FIRESTORE_HELPERS : "";
-  const blocks = AUTHZ_CONFIG.firestore.map(compileFirestoreResource).join("\n\n");
+export function buildFirestoreRules(config: ResolvedConfig = resolveConfig()): string {
+  const helpers = config.firestore.some(usesRoleLookup) ? FIRESTORE_HELPERS : "";
+  const blocks = config.firestore.map((resource) => compileFirestoreResource(resource, config)).join("\n\n");
   return `// GENERATED — do not hand edit. Source: shared/permissions/config.ts.
 // Regenerate with: npm run permissions:build
 // Layering: these rules protect DIRECT CLIENT access only. The Admin SDK
@@ -126,8 +177,6 @@ ${blocks}
 }
 `;
 }
-
-const FIRESTORE_RESOURCES_USE_LOOKUP = AUTHZ_CONFIG.firestore.some(usesRoleLookup);
 
 /** Compile a policy to a Storage CEL expression. */
 export function compileStoragePolicy(policy: Policy): string {
@@ -156,8 +205,8 @@ function compileStorageResource(resource: StorageResource): string {
     }`;
 }
 
-export function buildStorageRules(): string {
-  const blocks = AUTHZ_CONFIG.storage.map(compileStorageResource).join("\n\n");
+export function buildStorageRules(config: ResolvedConfig = resolveConfig()): string {
+  const blocks = config.storage.map(compileStorageResource).join("\n\n");
   return `// GENERATED — do not hand edit. Source: shared/permissions/config.ts.
 // Regenerate with: npm run permissions:build
 // Layering: these rules protect DIRECT CLIENT access only. The Admin SDK
@@ -211,20 +260,20 @@ function describePolicy(policy: Policy): string {
   }
 }
 
-export function buildPermissionsDoc(): string {
-  const grantRows = AUTHZ_CONFIG.permissions
-    .map((permission) => `| \`${permission}\` | ${(AUTHZ_CONFIG.grants[permission] ?? []).join(", ")} |`)
+export function buildPermissionsDoc(config: ResolvedConfig = resolveConfig()): string {
+  const grantRows = config.permissions
+    .map((permission) => `| \`${permission}\` | ${(config.grants[permission] ?? []).join(", ")} |`)
     .join("\n");
-  const routeRows = AUTHZ_CONFIG.routes
+  const routeRows = config.routes
     .map((route) => `| \`${route.name}\` | \`${route.path}\` | ${describePolicy(route.access)} |`)
     .join("\n");
-  const navRows = AUTHZ_CONFIG.navigation
+  const navRows = config.navigation
     .map((item) => `| \`${item.key}\` | \`${item.route}\` | ${describePolicy(item.visibility)} |`)
     .join("\n");
-  const featureRows = AUTHZ_CONFIG.features
+  const featureRows = config.features
     .map((feature) => `| \`${feature.name}\` | ${describePolicy(feature.access)} |`)
     .join("\n");
-  const firestoreRows = AUTHZ_CONFIG.firestore
+  const firestoreRows = config.firestore
     .map(
       (resource) =>
         `### \`${resource.collection}\` (\`${resource.path}\`)\n\n` +
@@ -234,12 +283,16 @@ export function buildPermissionsDoc(): string {
           .join("\n"),
     )
     .join("\n\n");
-  const storageRows = AUTHZ_CONFIG.storage
+  const storageRows = config.storage
     .map(
       (resource) =>
         `| \`${resource.name}\` (\`${resource.path}\`) | ${describePolicy(resource.read)} | ${describePolicy(resource.write)} | ${resource.maxSizeBytes} |`,
     )
     .join("\n");
+  const statusRows =
+    config.statuses.length === 0
+      ? "_No application statuses defined yet (setup step: application-statuses)._"
+      : config.statuses.map((set) => `| \`${set.name}\` | ${set.values.map((value) => `\`${value}\``).join(" → ")} |`).join("\n");
   return `<!-- GENERATED — do not hand edit. Source: shared/permissions/config.ts. -->
 # Permissions
 
@@ -249,7 +302,7 @@ come from the separate resource policies below.
 
 ## Roles
 
-${AUTHZ_CONFIG.roles.map((role) => `- \`${role}\``).join("\n")}
+${config.roles.map((role) => `- \`${role}\``).join("\n")}
 
 ## Permission grants
 
@@ -284,6 +337,12 @@ ${firestoreRows}
 | resource (path) | read | write | max bytes |
 |---|---|---|---|
 ${storageRows}
+
+## Application statuses
+
+| lifecycle | values in order |
+|---|---|
+${statusRows}
 `;
 }
 
@@ -293,7 +352,8 @@ ${storageRows}
 
 /** Write all generated outputs. Deterministic: same config, same bytes. */
 export function writeGenerated(root: string = process.cwd()): void {
-  writeFileSync(join(root, "firestore.rules"), buildFirestoreRules());
-  writeFileSync(join(root, "storage.rules"), buildStorageRules());
-  writeFileSync(join(root, "docs", "PERMISSIONS.md"), buildPermissionsDoc());
+  const config = resolveConfig(root);
+  writeFileSync(join(root, "firestore.rules"), buildFirestoreRules(config));
+  writeFileSync(join(root, "storage.rules"), buildStorageRules(config));
+  writeFileSync(join(root, "docs", "PERMISSIONS.md"), buildPermissionsDoc(config));
 }

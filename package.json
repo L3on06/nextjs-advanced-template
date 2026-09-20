@@ -13,7 +13,8 @@
     "emulators": "firebase emulators:start --project demo-starter --only auth,firestore,storage,functions",
     "deploy:firebase": "firebase deploy --only firestore:rules,firestore:indexes,storage,functions",
     "deploy:rules": "firebase deploy --only firestore:rules,storage",
-    "permissions:build": "tsc scripts/generate-permissions.ts shared/permissions/generate.ts shared/permissions/config.ts --ignoreConfig --types node --outDir node_modules/.permgen --module commonjs --target es2022 --skipLibCheck --strict --declaration false --sourceMap false && node node_modules/.permgen/scripts/generate-permissions.js"
+    "permissions:build": "tsc scripts/generate-permissions.ts shared/permissions/generate.ts shared/permissions/config.ts --ignoreConfig --types node --outDir node_modules/.permgen --module commonjs --target es2022 --skipLibCheck --strict --declaration false --sourceMap false && node node_modules/.permgen/scripts/generate-permissions.js",
+    "setup": "tsc scripts/run-setup.ts setup/engine.ts setup/state.ts setup/types.ts setup/steps/helpers.ts setup/steps/index.ts setup/steps/foundation.ts setup/steps/brand.ts setup/steps/model.ts setup/steps/finish.ts shared/permissions/generate.ts shared/permissions/config.ts --ignoreConfig --types node --outDir node_modules/.setupgen --module commonjs --target es2022 --skipLibCheck --strict --declaration false --sourceMap false && node node_modules/.setupgen/scripts/run-setup.js"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",

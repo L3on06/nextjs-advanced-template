@@ -18,6 +18,6 @@ export default defineConfig({
   test: {
     environment: "jsdom",
     setupFiles: ["./shared/test-setup.ts"],
-    include: ["shared/**/*.test.{ts,tsx}", "*.test.ts"],
+    include: ["shared/**/*.test.{ts,tsx}", "setup/**/*.test.{ts,tsx}", "*.test.ts"],
   },
 });

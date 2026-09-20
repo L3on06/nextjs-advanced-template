@@ -77,3 +77,9 @@ come from the separate resource policies below.
 | resource (path) | read | write | max bytes |
 |---|---|---|---|
 | `userFiles` (`users/{userId}/{filePath=**}`) | owner (`userId`) | owner (`userId`) | 10485760 |
+
+## Application statuses
+
+| lifecycle | values in order |
+|---|---|
+_No application statuses defined yet (setup step: application-statuses)._
