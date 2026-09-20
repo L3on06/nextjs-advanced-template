@@ -14,18 +14,18 @@ function renderWithLocale(ui: React.ReactNode) {
 
 describe("AppTable", () => {
   it("renders rows with typed columns", () => {
-    renderWithLocale(<AppTable columns={COLUMNS} rows={[{ id: "1", name: "Ada" }]} rowKey="id" emptyKey="status_empty_title" />);
+    renderWithLocale(<AppTable columns={COLUMNS} rows={[{ id: "1", name: "Ada" }]} rowKey="id" emptyKey="status.empty.title" />);
     expect(screen.getByText("Welcome")).toBeInTheDocument();
     expect(screen.getByText("Ada")).toBeInTheDocument();
   });
 
   it("renders the empty state when rows are absent", () => {
-    renderWithLocale(<AppTable columns={COLUMNS} rows={[]} rowKey="id" emptyKey="status_empty_title" />);
+    renderWithLocale(<AppTable columns={COLUMNS} rows={[]} rowKey="id" emptyKey="status.empty.title" />);
     expect(screen.getByText("Nothing here yet")).toBeInTheDocument();
   });
 
   it("renders skeleton rows apart from empty while loading", () => {
-    renderWithLocale(<AppTable columns={COLUMNS} rows={[]} rowKey="id" emptyKey="status_empty_title" isLoading />);
+    renderWithLocale(<AppTable columns={COLUMNS} rows={[]} rowKey="id" emptyKey="status.empty.title" isLoading />);
     expect(screen.getAllByLabelText("loading")).toHaveLength(3);
     expect(screen.queryByText("Nothing here yet")).not.toBeInTheDocument();
   });
@@ -36,7 +36,7 @@ describe("AppPage", () => {
     renderWithLocale(
       <AppPage
         titleKey="welcome"
-        state={<AppState variant="empty" titleKey="status_empty_title" />}
+        state={<AppState variant="empty" titleKey="status.empty.title" />}
       >
         <p>page body</p>
       </AppPage>,

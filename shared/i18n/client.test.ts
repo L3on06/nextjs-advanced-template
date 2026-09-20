@@ -9,10 +9,10 @@ describe("createClientI18n", () => {
   });
 
   it("interpolates values into the translation", () => {
-    expect(createClientI18n("en").t("hello_user", { name: "Leon" })).toBe(
+    expect(createClientI18n("en").t("hello.user", { name: "Leon" })).toBe(
       "Hello, Leon!",
     );
-    expect(createClientI18n("al").t("hello_user", { name: "Leon" })).toBe(
+    expect(createClientI18n("al").t("hello.user", { name: "Leon" })).toBe(
       "Përshëndetje, Leon!",
     );
   });
@@ -35,7 +35,7 @@ describe("createClientI18n", () => {
 
   it("treats dotted keys as flat strings, never as paths", () => {
     expect(createClientI18n("en").t("home.hint" as TranslationKey)).toBe(
-      "home.hint",
+      "Edit app/page.tsx and your UI updates live.",
     );
   });
 });

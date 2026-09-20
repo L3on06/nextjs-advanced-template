@@ -42,7 +42,7 @@ describe("getT", () => {
   it("interpolates values into the translation", async () => {
     const { t } = await getT("en");
 
-    expect(t("hello_user", { name: "Leon" })).toBe("Hello, Leon!");
+    expect(t("hello.user", { name: "Leon" })).toBe("Hello, Leon!");
   });
 
   it("returns the key itself when a translation is missing", async () => {

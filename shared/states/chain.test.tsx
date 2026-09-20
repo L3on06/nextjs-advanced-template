@@ -15,9 +15,9 @@ describe("status chain", () => {
       session: { state: "active" },
       online: true,
     };
-    const resolved = resolveAppState(ctx, undefined, { labelKey: "action_retry" });
+    const resolved = resolveAppState(ctx, undefined, { labelKey: "action.retry" });
     expect(resolved?.variant).toBe("warning");
-    expect(resolved?.titleKey).toBe("status_maintenance_title");
+    expect(resolved?.titleKey).toBe("status.maintenance.title");
     render(
       <I18nProvider locale="en">
         <AppState variant={resolved!.variant} titleKey={resolved!.titleKey} messageKey={resolved!.messageKey} action={resolved!.action} />

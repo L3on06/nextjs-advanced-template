@@ -1,9 +1,10 @@
-import { HomePage } from "@/components/home-page";
-import { getServerLocale } from "@/shared/i18n/server";
+import { redirect } from "next/navigation";
+import { DEFAULT_LOCALE } from "@/shared/i18n/settings";
 
-/** Cookie-mode home (/). Same content as /[locale], resolved from the cookie. */
-export default async function Home() {
-  const locale = await getServerLocale();
-
-  return <HomePage locale={locale} />;
+/**
+ * Prefix-mode entry (/). Canonical routes live under /[locale]; this address
+ * only forwards to the default locale. See docs/MIGRATION.md.
+ */
+export default function Home() {
+  redirect(`/${DEFAULT_LOCALE}`);
 }

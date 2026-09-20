@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import {
   AlertCircle,
   CheckCircle2,
@@ -8,6 +9,7 @@ import {
   TriangleAlert,
   type LucideIcon,
 } from "lucide-react";
+import { AppButton } from "@/components/app/app-button";
 import { T } from "@/components/i18n";
 import type { TranslationKey } from "@/shared/translations";
 import { cn } from "cn";
@@ -69,13 +71,13 @@ export function AppState({
       ) : null}
       {action ? (
         action.href ? (
-          <a href={action.href} className="mt-2 inline-flex h-8 items-center rounded-lg bg-primary px-2.5 text-sm font-medium text-primary-foreground">
+          <Link href={action.href} className="mt-2 inline-flex h-8 items-center rounded-lg bg-primary px-2.5 text-sm font-medium text-primary-foreground">
             <T k={action.labelKey} />
-          </a>
+          </Link>
         ) : (
-          <button type="button" onClick={action.onClick} className="mt-2 inline-flex h-8 items-center rounded-lg bg-primary px-2.5 text-sm font-medium text-primary-foreground">
+          <AppButton type="button" onClick={action.onClick}>
             <T k={action.labelKey} />
-          </button>
+          </AppButton>
         )
       ) : null}
     </div>

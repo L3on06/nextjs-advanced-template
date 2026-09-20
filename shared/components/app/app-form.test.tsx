@@ -16,7 +16,7 @@ function renderForm(onSubmit: (values: { name: string }) => void) {
         values={{ name: "" }}
         onChange={() => {}}
         onSubmit={onSubmit}
-        submitKey="action_retry"
+        submitKey="action.retry"
         formId="probe"
       >
         {({ field }) => {

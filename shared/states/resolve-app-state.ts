@@ -17,7 +17,7 @@ export interface ResolvedAppState {
 }
 
 function keyFor(status: StatusId, part: "title" | "message"): TranslationKey {
-  return `status_${status.replace(/-/g, "_")}_${part}` as TranslationKey;
+  return `status.${status.replace(/-/g, ".")}.${part}` as TranslationKey;
 }
 
 /**

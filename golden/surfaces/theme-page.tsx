@@ -11,33 +11,33 @@ import { useThemeSettings } from "@/shared/themes/use-theme-settings";
 export default function GoldenThemePage() {
   const { settings, update } = useThemeSettings();
   return (
-    <AppPage titleKey="theme_title">
-      <AppCard titleKey="theme_mode">
+    <AppPage titleKey="theme.title">
+      <AppCard titleKey="theme.mode">
         <AppSelect
           value={settings.mode}
           onChange={(mode) => update({ mode: mode as typeof settings.mode })}
           options={[
-            { value: "light", labelKey: "theme_mode" },
-            { value: "dark", labelKey: "theme_mode" },
-            { value: "system", labelKey: "theme_mode" },
+            { value: "light", labelKey: "theme.mode" },
+            { value: "dark", labelKey: "theme.mode" },
+            { value: "system", labelKey: "theme.mode" },
           ]}
         />
       </AppCard>
-      <AppCard titleKey="theme_density">
+      <AppCard titleKey="theme.density">
         <AppButton onClick={() => update({ density: settings.density === "compact" ? "comfortable" : "compact" })}>
-          <T k="theme_density" />
+          <T k="theme.density" />
         </AppButton>
       </AppCard>
-      <AppCard titleKey="theme_primary">
+      <AppCard titleKey="theme.primary">
         <AppSelect
           value={settings.primary}
           onChange={(primary) => update({ primary: primary as typeof settings.primary })}
           options={[
-            { value: "blue", labelKey: "theme_primary" },
-            { value: "green", labelKey: "theme_primary" },
-            { value: "violet", labelKey: "theme_primary" },
-            { value: "amber", labelKey: "theme_primary" },
-            { value: "rose", labelKey: "theme_primary" },
+            { value: "blue", labelKey: "theme.primary" },
+            { value: "green", labelKey: "theme.primary" },
+            { value: "violet", labelKey: "theme.primary" },
+            { value: "amber", labelKey: "theme.primary" },
+            { value: "rose", labelKey: "theme.primary" },
           ]}
         />
       </AppCard>

@@ -22,28 +22,28 @@ function SignInCard() {
   if (loading) return null;
   if (user) {
     return (
-      <AppCard titleKey="auth_signed_in_as">
+      <AppCard titleKey="auth.signed.in.as">
         <p>{user.email}</p>
         <AppButton onClick={() => void signOutEverywhere()}>
-          <T k="action_sign_in" />
+          <T k="action.sign.in" />
         </AppButton>
       </AppCard>
     );
   }
   return (
-    <AppCard titleKey="sign_in_title">
-      <AppForm schema={Schema} values={values} onChange={setValues} onSubmit={(next) => void signInWithEmail(next)} submitKey="action_sign_in" formId="golden-sign-in">
+    <AppCard titleKey="sign.in.title">
+      <AppForm schema={Schema} values={values} onChange={setValues} onSubmit={(next) => void signInWithEmail(next)} submitKey="action.sign.in" formId="golden-sign-in">
         {({ field }) => {
           const email = field("email");
           const password = field("password");
           return (
             <>
               <label htmlFor={email.bind.id}>
-                <T k="auth_email" />
+                <T k="auth.email" />
               </label>
               <AppInput fieldError={email.error} {...email.bind} type="email" />
               <label htmlFor={password.bind.id}>
-                <T k="auth_password" />
+                <T k="auth.password" />
               </label>
               <AppInput fieldError={password.error} {...password.bind} type="password" />
             </>
@@ -51,7 +51,7 @@ function SignInCard() {
         }}
       </AppForm>
       <AppButton onClick={() => void signInWithGoogle()}>
-        <T k="auth_continue_google" />
+        <T k="auth.continue.google" />
       </AppButton>
     </AppCard>
   );
@@ -61,7 +61,7 @@ function SignInCard() {
 export default function GoldenSignInPage() {
   return (
     <SessionProvider>
-      <AppPage titleKey="sign_in_title">
+      <AppPage titleKey="sign.in.title">
         <SignInCard />
       </AppPage>
     </SessionProvider>

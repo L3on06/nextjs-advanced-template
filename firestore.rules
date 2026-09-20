@@ -34,7 +34,7 @@ service cloud.firestore {
       allow get: if (request.auth != null && (hasRole('editor') || hasRole('admin'))) || (request.auth != null && request.auth.token.email == resource.data.email);
       allow list: if request.auth != null && (hasRole('editor') || hasRole('admin'));
       allow create: if request.auth != null && (hasRole('editor') || hasRole('admin'));
-      allow update: if (request.auth != null && (hasRole('editor') || hasRole('admin'))) || (resource.data.status == 'pending' && request.resource.data.status == 'accepted' && request.resource.data.email == resource.data.email && request.resource.data.role == resource.data.role);
+      allow update: if (request.auth != null && (hasRole('editor') || hasRole('admin'))) || (request.auth != null && resource.data.status == 'pending' && request.resource.data.status == 'accepted' && request.resource.data.email == resource.data.email && request.resource.data.role == resource.data.role);
       allow delete: if request.auth != null && (hasRole('editor') || hasRole('admin'));
     }
 

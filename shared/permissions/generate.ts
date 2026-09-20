@@ -107,6 +107,7 @@ export function compileFirestorePolicy(
         (field) => `request.resource.data.${field} == resource.data.${field}`,
       );
       return [
+        `request.auth != null`,
         `resource.data.${policy.field} == '${policy.from}'`,
         `request.resource.data.${policy.field} == '${policy.to}'`,
         ...frozen,

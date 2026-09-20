@@ -28,11 +28,11 @@ describe("translation files", () => {
   it("actually translates instead of copying English", () => {
     expect(al.welcome).not.toBe(en.welcome);
     expect(al.language).not.toBe(en.language);
-    expect(al.home_hint).not.toBe(en.home_hint);
+    expect(al["home.hint"]).not.toBe(en["home.hint"]);
   });
 
   it("renders a name through the greeting placeholder", () => {
-    expect(en.hello_user).toContain("{{name}}");
-    expect(al.hello_user).toContain("{{name}}");
+    expect(en["hello.user"]).toContain("{{name}}");
+    expect(al["hello.user"]).toContain("{{name}}");
   });
 });

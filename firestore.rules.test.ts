@@ -191,4 +191,23 @@ describe("firestore.rules: invites with status transitions", () => {
     const inviteeDb = testEnv.authenticatedContext("invitee-uid", { email: INVITEE_EMAIL }).firestore();
     await assertFails(updateDoc(doc(inviteeDb, "invites", "invite-1"), { status: "accepted", role: "admin" }));
   });
+
+  it("denies unauthenticated invite acceptance", async () => {
+    await seed();
+    const db = testEnv.unauthenticatedContext().firestore();
+    await assertFails(updateDoc(doc(db, "invites", "invite-1"), { status: "accepted" }));
+  });
+
+  it("denies authenticated non-invitee acceptance", async () => {
+    await seed();
+    const db = testEnv.authenticatedContext(STRANGER, { email: "stranger@example.com" }).firestore();
+    await assertFails(updateDoc(doc(db, "invites", "invite-1"), { status: "accepted" }));
+  });
+
+  it("lets admins update invites through the manager path", async () => {
+    await seed();
+    const db = testEnv.authenticatedContext(ADMIN).firestore();
+    await assertSucceeds(updateDoc(doc(db, "invites", "invite-1"), { status: "accepted" }));
+  });
+});
 });

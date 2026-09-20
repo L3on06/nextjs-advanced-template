@@ -21,7 +21,7 @@ describe("T", () => {
   });
 
   it("interpolates values into the translation", () => {
-    renderWithLocale("al", <T k="hello_user" values={{ name: "Leon" }} />);
+    renderWithLocale("al", <T k="hello.user" values={{ name: "Leon" }} />);
 
     expect(screen.getByText("Përshëndetje, Leon!")).toBeInTheDocument();
   });

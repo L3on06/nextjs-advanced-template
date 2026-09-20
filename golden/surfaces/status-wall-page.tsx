@@ -21,7 +21,7 @@ const CONTEXTS: Record<(typeof STATUS_IDS)[number], StatusContext> = {
  */
 export default function GoldenStatusWallPage() {
   return (
-    <AppPage titleKey="status_wall_title">
+    <AppPage titleKey="status.wall.title">
       {STATUS_IDS.map((id) => {
         const rules =
           id === "feature-disabled"

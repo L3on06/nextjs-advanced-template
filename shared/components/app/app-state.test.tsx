@@ -13,16 +13,16 @@ function renderState(ui: React.ReactNode) {
 
 describe("AppState", () => {
   it.each(VARIANTS)("renders the %s variant with title and message", (variant) => {
-    renderState(<AppState variant={variant} titleKey="status_empty_title" messageKey="status_empty_message" />);
+    renderState(<AppState variant={variant} titleKey="status.empty.title" messageKey="status.empty.message" />);
     expect(screen.getByText("Nothing here yet")).toBeInTheDocument();
     expect(screen.getByText("New items will appear in this space.")).toBeInTheDocument();
   });
 
   it("announces errors assertively and other views politely", () => {
-    const { unmount } = renderState(<AppState variant="error" titleKey="status_empty_title" />);
+    const { unmount } = renderState(<AppState variant="error" titleKey="status.empty.title" />);
     expect(screen.getByRole("alert")).toBeInTheDocument();
     unmount();
-    renderState(<AppState variant="info" titleKey="status_empty_title" />);
+    renderState(<AppState variant="info" titleKey="status.empty.title" />);
     expect(screen.getByRole("status")).toBeInTheDocument();
   });
 
@@ -30,7 +30,7 @@ describe("AppState", () => {
     const user = userEvent.setup();
     const onClick = vi.fn();
     renderState(
-      <AppState variant="empty" titleKey="status_empty_title" action={{ labelKey: "action_retry", onClick }} />,
+      <AppState variant="empty" titleKey="status.empty.title" action={{ labelKey: "action.retry", onClick }} />,
     );
     await user.click(screen.getByRole("button", { name: "Try again" }));
     expect(onClick).toHaveBeenCalledTimes(1);
@@ -38,7 +38,7 @@ describe("AppState", () => {
 
   it("renders link actions as anchors", () => {
     renderState(
-      <AppState variant="info" titleKey="status_empty_title" action={{ labelKey: "action_sign_in", href: "/sign-in" }} />,
+      <AppState variant="info" titleKey="status.empty.title" action={{ labelKey: "action.sign.in", href: "/sign-in" }} />,
     );
     expect(screen.getByRole("link", { name: "Sign in" })).toHaveAttribute("href", "/sign-in");
   });

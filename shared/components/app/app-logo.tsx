@@ -34,7 +34,7 @@ export function AppLogo({
   if (!brandName || !brandColor) {
     return (
       <span className={cn("text-lg font-semibold", className)}>
-        <T k="app_title" />
+        <T k="app.title" />
       </span>
     );
   }
