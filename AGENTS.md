@@ -66,3 +66,42 @@ Follow these rules on every change that touches user facing text.
   extend `LOCALE_META`, no component changes needed.
 - The switcher labels each language in its own language (`English`, `Shqip`).
   Never run those labels through `t()`.
+
+# Agent entry point (Starter Kit AI development system)
+
+This is the entry point. Follow it on every task before editing.
+
+## 1. Determine paths, then load skills
+
+1. List every path the task will create, edit, or delete.
+2. Resolve each path through `.agents/rules/path-map.md` (the canonical
+   path-to-skill mapping; do not guess).
+3. Load every matching subsystem skill under `.agents/skills/` plus its related
+   blueprint under `docs/blueprints/` before making changes.
+4. Load the workflow under `.agents/workflows/` that matches the change type
+   (`new-feature`, `bug-fix`, `core-change`, `breaking-change`,
+   `dependency-update`, `firebase-change`, `generated-file-change`,
+   `starter-kit-update`).
+5. A path matching no row uses the closest parent row; a genuinely new top
+   level path falls back to the `architecture` skill.
+
+## 2. Global rules
+
+- Ownership: `CORE` is generic and versioned, `GENERATED` is regenerated never
+  hand edited, `APPLICATION` holds business logic, `CONFIGURATION` holds env
+  and settings, `MIGRATION` holds upgrade notes, `EXTERNAL` holds vendor
+  contracts. Full table in `.agents/rules/ownership.md`.
+- Imports flow downward only: `app/` → `features/` → `modules/` → `shared/`.
+  No upward or circular imports.
+- No secrets in the repo. Env is validated with fail fast at boot.
+- No business logic in `CORE`. No hardcoded user facing copy, routes, or role
+  strings outside their owning modules.
+
+## 3. Responsibility split
+
+- `AGENTS.md` holds global rules and this entry procedure.
+- `.agents/skills/` holds subsystem-specific rules (one subsystem each).
+- `docs/blueprints/` holds architectural contracts.
+- `.agents/workflows/` holds procedures.
+- Never duplicate one layer's content into another; point at it.
+- System overview: `.agents/README.md`.
