@@ -1,26 +1,14 @@
-// Firestore Security Rules — deny by default (Rules version 2).
-//
-// LAYERS (each rechecks; none assumes another already did):
-// - These rules protect DIRECT CLIENT access only.
-// - Cloud Functions and server code use the Admin SDK, which BYPASSES these
-//   rules entirely, so they must enforce authorization themselves (session
-//   verification + role checks + input validation at every entry).
-// - App guards (`authorization` skill) protect routes and actions in addition.
-//
-// Generic starter resources only: `users/{uid}` profiles for the auth/RBAC
-// foundation. Business collections belong to features, each with its own
-// rule block reviewed per the firebase-security skill.
+// GENERATED — do not hand edit. Source: shared/permissions/config.ts.
+// Regenerate with: npm run permissions:build
+// Layering: these rules protect DIRECT CLIENT access only. The Admin SDK
+// bypasses them, so server code must authorize every use (see
+// shared/firebase/admin.ts). Guards recheck independently.
 rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-
     function isSignedIn() {
       return request.auth != null;
-    }
-
-    function isOwner(userId) {
-      return isSignedIn() && request.auth.uid == userId;
     }
 
     function callerRoles() {
@@ -34,23 +22,24 @@ service cloud.firestore {
       return role in callerRoles();
     }
 
-    // Starter profile for the signed in user. Owners manage their own
-    // document but can never grant themselves roles; only admins change roles.
     match /users/{userId} {
-      allow get: if isOwner(userId) || hasRole('admin');
+      allow get: if (request.auth != null && request.auth.uid == userId) || (request.auth != null && (hasRole('admin')));
       allow list: if false;
-      allow create: if isOwner(userId)
-        && request.resource.data.uid == userId
-        && request.resource.data.roles == ['viewer']
-        && request.resource.data.keys().hasAll(['uid', 'email', 'displayName', 'roles']);
-      allow update: if (isOwner(userId)
-          && request.resource.data.roles == resource.data.roles)
-        || hasRole('admin');
-      allow delete: if hasRole('admin');
+      allow create: if (request.auth != null && request.auth.uid == userId) && (request.resource.data.keys().hasAll(["uid","email","displayName","roles"]) && request.resource.data.uid == userId && request.resource.data.roles == ['viewer']);
+      allow update: if ((request.auth != null && request.auth.uid == userId) && (request.resource.data.roles == resource.data.roles)) || (request.auth != null && (hasRole('admin')));
+      allow delete: if request.auth != null && (hasRole('admin'));
+    }
+
+    match /invites/{inviteId} {
+      allow get: if (request.auth != null && (hasRole('editor') || hasRole('admin'))) || (request.auth != null && request.auth.token.email == resource.data.email);
+      allow list: if request.auth != null && (hasRole('editor') || hasRole('admin'));
+      allow create: if request.auth != null && (hasRole('editor') || hasRole('admin'));
+      allow update: if (request.auth != null && (hasRole('editor') || hasRole('admin'))) || (resource.data.status == 'pending' && request.resource.data.status == 'accepted' && request.resource.data.email == resource.data.email && request.resource.data.role == resource.data.role);
+      allow delete: if request.auth != null && (hasRole('editor') || hasRole('admin'));
     }
 
     // Deny everything else by default. New collections fail closed until a
-    // reviewed rule block is added.
+    // reviewed resource policy is added to the config.
     match /{document=**} {
       allow read, write: if false;
     }

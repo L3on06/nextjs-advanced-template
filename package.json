@@ -12,7 +12,8 @@
     "test:rules": "firebase emulators:exec --project demo-starter --only firestore,storage \"vitest run firestore.rules.test.ts storage.rules.test.ts\"",
     "emulators": "firebase emulators:start --project demo-starter --only auth,firestore,storage,functions",
     "deploy:firebase": "firebase deploy --only firestore:rules,firestore:indexes,storage,functions",
-    "deploy:rules": "firebase deploy --only firestore:rules,storage"
+    "deploy:rules": "firebase deploy --only firestore:rules,storage",
+    "permissions:build": "tsc scripts/generate-permissions.ts shared/permissions/generate.ts shared/permissions/config.ts --ignoreConfig --types node --outDir node_modules/.permgen --module commonjs --target es2022 --skipLibCheck --strict --declaration false --sourceMap false && node node_modules/.permgen/scripts/generate-permissions.js"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",
