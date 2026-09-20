@@ -1,0 +1,58 @@
+// Firestore Security Rules — deny by default (Rules version 2).
+//
+// LAYERS (each rechecks; none assumes another already did):
+// - These rules protect DIRECT CLIENT access only.
+// - Cloud Functions and server code use the Admin SDK, which BYPASSES these
+//   rules entirely, so they must enforce authorization themselves (session
+//   verification + role checks + input validation at every entry).
+// - App guards (`authorization` skill) protect routes and actions in addition.
+//
+// Generic starter resources only: `users/{uid}` profiles for the auth/RBAC
+// foundation. Business collections belong to features, each with its own
+// rule block reviewed per the firebase-security skill.
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function callerRoles() {
+      return isSignedIn()
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        ? get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('roles', [])
+        : [];
+    }
+
+    function hasRole(role) {
+      return role in callerRoles();
+    }
+
+    // Starter profile for the signed in user. Owners manage their own
+    // document but can never grant themselves roles; only admins change roles.
+    match /users/{userId} {
+      allow get: if isOwner(userId) || hasRole('admin');
+      allow list: if false;
+      allow create: if isOwner(userId)
+        && request.resource.data.uid == userId
+        && request.resource.data.roles == ['viewer']
+        && request.resource.data.keys().hasAll(['uid', 'email', 'displayName', 'roles']);
+      allow update: if (isOwner(userId)
+          && request.resource.data.roles == resource.data.roles)
+        || hasRole('admin');
+      allow delete: if hasRole('admin');
+    }
+
+    // Deny everything else by default. New collections fail closed until a
+    // reviewed rule block is added.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "name": "functions",
+  "private": true,
+  "version": "0.1.0",
+  "engines": { "node": "22" },
+  "main": "lib/index.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "echo \"functions unit tests run from the repo root suite\" && exit 0"
+  },
+  "dependencies": {
+    "firebase-admin": "14.4.0",
+    "firebase-functions": "7.4.0",
+    "zod": "4.6.5"
+  },
+  "devDependencies": {
+    "typescript": "5.9.3"
+  }
+}
